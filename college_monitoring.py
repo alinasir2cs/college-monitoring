@@ -29,8 +29,7 @@ st.markdown(
 # -----------------------------
 scope = ["https://www.googleapis.com/auth/spreadsheets",
          "https://www.googleapis.com/auth/drive"]
-json_path = os.path.join(os.path.dirname(__file__), "jovial-inkwell-286213-206c22f82ad4.json")
-creds = Credentials.from_service_account_file(json_path, scopes=scope)
+creds = Credentials.from_service_account_info(st.secrets["gcp_service_account"])
 gc = gspread.authorize(creds)
 
 sheet_name = "Provincial Action Plan for Accelerating the Transition to a Cashless Economy (Responses)"
@@ -186,3 +185,4 @@ with tabs[1]:
     # Collapsible raw data table
     with st.expander("Show Raw College Data Table"):
         st.dataframe(college_data, height=400)
+
