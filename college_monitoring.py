@@ -30,7 +30,7 @@ st.markdown(
 scope = ["https://www.googleapis.com/auth/spreadsheets",
          "https://www.googleapis.com/auth/drive"]
 creds = Credentials.from_service_account_info(
-    st.secrets["gcp_service_account"], scopes=SCOPES
+    st.secrets["gcp_service_account"], scopes=scope
 )
 gc = gspread.authorize(creds)
 
@@ -187,6 +187,7 @@ with tabs[1]:
     # Collapsible raw data table
     with st.expander("Show Raw College Data Table"):
         st.dataframe(college_data, height=400)
+
 
 
 
