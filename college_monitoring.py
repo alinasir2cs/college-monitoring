@@ -34,8 +34,8 @@ creds = Credentials.from_service_account_info(
 )
 gc = gspread.authorize(creds)
 
-sheet_name = "Provincial Action Plan for Accelerating the Transition to a Cashless Economy (Responses)"
-worksheet_name = "Form responses 2"
+sheet_name = "Special Monitoring of Govt. Colleges  (Responses)"
+worksheet_name = "Form Responses 1"
 sh = gc.open(sheet_name)
 ws = sh.worksheet(worksheet_name)
 
@@ -187,5 +187,6 @@ with tabs[1]:
     # Collapsible raw data table
     with st.expander("Show Raw College Data Table"):
         st.dataframe(college_data, height=400)
+
 
 
