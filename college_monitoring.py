@@ -65,33 +65,38 @@ for col in facility_cols:
     data[col] = data[col].apply(lambda x: 1 if str(x).strip().lower() == "yes" else 0)
 
 # -----------------------------
-# Sidebar Filters
+# Sidebar Filters (using column positions: C, F, S)
 # -----------------------------
 st.sidebar.header("Filters")
 
+# Map columns by position
+col_district = data.columns[2]   # C column
+col_college = data.columns[5]    # F column
+col_officer = data.columns[18]   # S column (if exists)
+
 # District filter
-districts = data["Select District"].unique()
+districts = data[col_district].unique()
 selected_district = st.sidebar.selectbox("Select District", options=["All"] + list(districts))
 
 if selected_district != "All":
-    filtered_data = data[data["Select District"] == selected_district]
+    filtered_data = data[data[col_district] == selected_district]
 else:
     filtered_data = data
 
 # College filter
-colleges = filtered_data["Provide College name"].unique()
+colleges = filtered_data[col_college].unique()
 selected_college = st.sidebar.selectbox("Select College", options=["All"] + list(colleges))
 
 if selected_college != "All":
-    filtered_data = filtered_data[filtered_data["Provide College name"] == selected_college]
+    filtered_data = filtered_data[filtered_data[col_college] == selected_college]
 
-# Monitoring Officer filter
-if "Monitoring Officer Name" in data.columns:   # make sure column exists
-    officers = filtered_data["Monitoring Officer Name"].unique()
+# Monitoring Officer filter (if column exists)
+if col_officer in data.columns:
+    officers = filtered_data[col_officer].unique()
     selected_officer = st.sidebar.selectbox("Select Monitoring Officer", options=["All"] + list(officers))
 
     if selected_officer != "All":
-        filtered_data = filtered_data[filtered_data["Monitoring Officer Name"] == selected_officer]
+        filtered_data = filtered_data[filtered_data[col_officer] == selected_officer]
 
 # Final filtered data for downstream usage
 college_data = filtered_data
@@ -101,8 +106,8 @@ college_data = filtered_data
 # -----------------------------
 st.markdown("### 📈 Key Metrics")
 col1, col2, col3 = st.columns(3)
-col1.metric("Total Districts", len(filtered_data["Select District"].unique()))
-col2.metric("Total Colleges", len(filtered_data["Provide College name"].unique()))
+col1.metric("Total Districts", len(filtered_data[col_district].unique()))
+col2.metric("Total Colleges", len(filtered_data[col_college].unique()))
 col3.metric("Total Responses", len(filtered_data))
 
 # -----------------------------
@@ -187,6 +192,7 @@ with tabs[1]:
     # Collapsible raw data table
     with st.expander("Show Raw College Data Table"):
         st.dataframe(college_data, height=400)
+
 
 
 
