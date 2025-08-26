@@ -29,7 +29,9 @@ st.markdown(
 # -----------------------------
 scope = ["https://www.googleapis.com/auth/spreadsheets",
          "https://www.googleapis.com/auth/drive"]
-creds = Credentials.from_service_account_info(st.secrets["gcp_service_account"])
+creds = Credentials.from_service_account_info(
+    st.secrets["gcp_service_account"], scopes=SCOPES
+)
 gc = gspread.authorize(creds)
 
 sheet_name = "Provincial Action Plan for Accelerating the Transition to a Cashless Economy (Responses)"
@@ -185,4 +187,5 @@ with tabs[1]:
     # Collapsible raw data table
     with st.expander("Show Raw College Data Table"):
         st.dataframe(college_data, height=400)
+
 
