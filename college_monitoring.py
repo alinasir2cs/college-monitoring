@@ -1,7 +1,7 @@
+import base64
 import os
 import streamlit as st
 import pandas as pd
-import plotly.express as px
 from google.oauth2.service_account import Credentials
 import gspread
 
@@ -9,20 +9,6 @@ import gspread
 # Page Config
 # -----------------------------
 st.set_page_config(page_title="College Facility Dashboard", layout="wide")
-
-# -----------------------------
-# Banner with College Symbol
-# -----------------------------
-st.markdown(
-    """
-    <div style="width: 100%; background-color: #4B7BEC; padding: 15px; display: flex; align-items: center; border-radius: 10px;">
-        <img src="https://tse2.mm.bing.net/th/id/OIP.Nnr8QO-hQeDzRbpGERuXegHaFj?rs=1&pid=ImgDetMain&o=7&rm=3" 
-             alt="College" style="height:60px; margin-right:20px;">
-        <h1 style="color:white; margin:0;">College Facility Monitoring Dashboard</h1>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
 
 # -----------------------------
 # Google Sheets Authentication
@@ -44,154 +30,293 @@ data = pd.DataFrame(ws.get_all_records())
 data.columns = [col.strip() for col in data.columns]
 
 # -----------------------------
-# Data Preprocessing
+# Column references by position
 # -----------------------------
-facility_cols = [
-    "Classrooms cleaned, ventilated, and furniture arranged?",
-    "Toilets cleaned, functional, and with water supply?",
-    "Drinking water availability and quality check?",
-    "Electricity and lighting functional in classrooms and labs?",
-    "Campus grounds cleaned (lawns, courtyards, pathways)?",
-    "Boundary wall and gates secured (no open or broken sections)?",
-    "Science labs ready with basic equipment and chemicals?",
-    "IT/Computer labs functional (systems, internet, power)?",
-    "Library operational clean and open for students?",
-    "Biometric Attendance Device installed and functional?",
-    "Students attendance registers available and ready?",
-    "Principal and administration staff presence on reopening day?"
-]
+col_district = data.columns[2]   # C
+col_gender = data.columns[3]     # D (assume gender col here, adjust if diff)
+col_type = data.columns[4]       # E (assume college type col)
+col_college = data.columns[5]    # F
+col_officer = data.columns[18]   # S (if exists)
 
-for col in facility_cols:
+# -----------------------------
+# Facility Columns
+# -----------------------------
+facility_cols = {
+    "Classrooms cleaned, ventilated, and furniture arranged?": "class.jpg",
+    "Toilets cleaned, functional, and with water supply?": "toilets.jpg",
+    "Drinking water availability and quality check?": "water.jpg",
+    "Electricity and lighting functional in classrooms and labs?": "electricity.jpg",
+    "Campus grounds cleaned (lawns, courtyards, pathways)?": "grounds.jpg",
+    "Boundary wall and gates secured (no open or broken sections)?": "boundry.jpg",
+    "Science labs ready with basic equipment and chemicals?": "science.jpg",
+    "IT/Computer labs functional (systems, internet, power)?": "it.jpg",
+    "Library operational clean and open for students?": "library.jpg",
+    "Biometric Attendance Device installed and functional?": "bio.jpg",
+    "Principal and administration staff presence on reopening day?": 'attendance.jpg',
+    "Students attendance registers available and ready?": "students.jpg"
+}
+
+# Convert yes/no → 1/0
+for col in facility_cols.keys():
     data[col] = data[col].apply(lambda x: 1 if str(x).strip().lower() == "yes" else 0)
 
 # -----------------------------
-# Sidebar Filters (using column positions: C, F, S)
+# Top Summary Cards
 # -----------------------------
-st.sidebar.header("Filters")
+st.markdown("## 🎓 College Monitoring Overview")
+col1, col2, col3, col4 = st.columns(4)
 
-# Map columns by position
-col_district = data.columns[2]   # C column
-col_college = data.columns[5]    # F column
-col_officer = data.columns[18]   # S column (if exists)
+with col1:
+    st.markdown(f"""
+    <div style="background:#3498db; padding:20px; border-radius:10px; text-align:center;">
+        <h2 style="color:white;">{(data[col_type]=='General').sum()}</h2>
+        <p style="color:white;">General Colleges</p>
+    </div>
+    """, unsafe_allow_html=True)
 
-# District filter
-districts = data[col_district].unique()
-selected_district = st.sidebar.selectbox("Select District", options=["All"] + list(districts))
+with col2:
+    st.markdown(f"""
+    <div style="background:#2f3542; padding:20px; border-radius:10px; text-align:center;">
+        <h2 style="color:white;">{(data[col_type]=='Commerce').sum()}</h2>
+        <p style="color:white;">Commerce Colleges</p>
+    </div>
+    """, unsafe_allow_html=True)
 
-if selected_district != "All":
-    filtered_data = data[data[col_district] == selected_district]
-else:
-    filtered_data = data
+with col3:
+    st.markdown(f"""
+    <div style="background:#2ecc71; padding:20px; border-radius:10px; text-align:center;">
+        <h2 style="color:white;">{(data[col_gender]=='Male').sum()}</h2>
+        <p style="color:white;">Male Colleges</p>
+    </div>
+    """, unsafe_allow_html=True)
 
-# College filter
-colleges = filtered_data[col_college].unique()
-selected_college = st.sidebar.selectbox("Select College", options=["All"] + list(colleges))
+with col4:
+    st.markdown(f"""
+    <div style="background:#e74c3c; padding:20px; border-radius:10px; text-align:center;">
+        <h2 style="color:white;">{(data[col_gender]=='Female').sum()}</h2>
+        <p style="color:white;">Female Colleges</p>
+    </div>
+    """, unsafe_allow_html=True)
 
-if selected_college != "All":
-    filtered_data = filtered_data[filtered_data[col_college] == selected_college]
-
-# Monitoring Officer filter (if column exists)
-if col_officer in data.columns:
-    officers = filtered_data[col_officer].unique()
-    selected_officer = st.sidebar.selectbox("Select Monitoring Officer", options=["All"] + list(officers))
-
-    if selected_officer != "All":
-        filtered_data = filtered_data[filtered_data[col_officer] == selected_officer]
-
-# Final filtered data for downstream usage
-college_data = filtered_data
+# Initialize defaults before widgets
+if "district" not in st.session_state:
+    st.session_state["district"] = "All"
+if "gender" not in st.session_state:
+    st.session_state["gender"] = "All"
+if "type" not in st.session_state:
+    st.session_state["type"] = "All"
+if "compliance" not in st.session_state:
+    st.session_state["compliance"] = "All"
 
 # -----------------------------
-# Metrics Cards
+# Filters with Styled Buttons
 # -----------------------------
-st.markdown("### 📈 Key Metrics")
-col1, col2, col3 = st.columns(3)
-col1.metric("Total Districts", len(filtered_data[col_district].unique()))
-col2.metric("Total Colleges", len(filtered_data[col_college].unique()))
-col3.metric("Total Responses", len(filtered_data))
+st.markdown("### 🔍 Filters")
 
-# -----------------------------
-# Tabs for District / College Analysis
-# -----------------------------
-tabs = st.tabs(["District Analysis", "College Analysis"])
+# Inject CSS for button styling
+st.markdown("""
+    <style>
+    div.stButton > button:first-child {
+        padding: 0.45rem 1.2rem;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        margin-top: 28px; /* aligns with selectbox */
+    }
+    div.stButton.apply-btn > button:first-child {
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+    }
+    div.stButton.apply-btn > button:first-child:hover {
+        background-color: #45a049;
+        color: white;
+    }
+    div.stButton.clear-btn > button:first-child {
+        background-color: #f44336;
+        color: white;
+        border: none;
+    }
+    div.stButton.clear-btn > button:first-child:hover {
+        background-color: #d32f2f;
+        color: white;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
-# --- District Analysis Tab ---
-with tabs[0]:
-    st.subheader("Facility Summary (District Level)")
+f1, f2, f3, f4, f5, f6 = st.columns([2, 2, 2, 2, 1, 1])
 
-    # --- Horizontal Bar Chart ---
-    district_summary = filtered_data[facility_cols].sum().sort_values()
-    fig_bar = px.bar(
-        x=district_summary.values,
-        y=district_summary.index,
-        orientation='h',
-        labels={'x': 'Count of Yes', 'y': 'Facility'},
-        title=f"Facility Availability in {selected_district if selected_district != 'All' else 'All Districts'}",
-        template="plotly_dark",
-        color=district_summary.values,
-        color_continuous_scale=["#ff7f0e", "#1f77b4"]  # orange → blue
+with f1:
+    selected_district = st.selectbox(
+        "Select District",
+        options=["All"] + list(data[col_district].unique()),
+        key="district"
     )
-    st.plotly_chart(fig_bar, use_container_width=True)
-
-    # --- Pie Charts (2 per row) ---
-    st.subheader("Overall Facility Status Pie Charts")
-    cols = st.columns(2)  # define 2 columns for pie charts
-
-    for i, col in enumerate(facility_cols):
-        yes_count = filtered_data[col].sum()
-        no_count = len(filtered_data) - yes_count
-
-        fig_pie = px.pie(
-            names=["Yes", "No"],
-            values=[yes_count, no_count],
-            title=f"{col} ({selected_district if selected_district != 'All' else 'All Districts'})",
-            color=["Yes", "No"],
-            color_discrete_map={"Yes": "#1f77b4", "No": "#ff7f0e"}
-        )
-
-        with cols[i % 2]:  # alternate placement across 2 columns
-            st.plotly_chart(fig_pie, use_container_width=True)
-
-# --- College Analysis Tab ---
-with tabs[1]:
-    st.subheader("Facility Summary (College Level)")
-
-    # --- Horizontal Bar Chart ---
-    college_summary = college_data[facility_cols].sum().sort_values()
-    fig_bar_college = px.bar(
-        x=college_summary.values,
-        y=college_summary.index,
-        orientation='h',
-        labels={'x': 'Count of Yes', 'y': 'Facility'},
-        title=f"Facility Availability in {selected_college if selected_college != 'All' else 'All Colleges'}",
-        template="plotly_dark",
-        color=college_summary.values,
-        color_continuous_scale=["#ff7f0e", "#1f77b4"]  # orange → blue
+with f2:
+    selected_gender = st.selectbox(
+        "Select Gender",
+        options=["All"] + list(data[col_gender].unique()),
+        key="gender"
     )
-    st.plotly_chart(fig_bar_college, use_container_width=True)
+with f3:
+    selected_type = st.selectbox(
+        "Select College Type",
+        options=["All"] + list(data[col_type].unique()),
+        key="type"
+    )
 
-    # --- Pie Charts (2 per row) ---
-    st.subheader("Overall Facility Status Pie Charts")
-    cols = st.columns(2)  # define 2 columns for pie charts
+with f4:
+    selected_compliance = st.selectbox(
+        "Compliance Filter",
+        options=["All", "<= 50%", "> 50%"],
+        key="compliance"
+    )
 
-    for i, col in enumerate(facility_cols):
-        yes_count = college_data[col].sum()
-        no_count = len(college_data) - yes_count
+with f5:
+    apply = st.button("Apply Filters", key="apply")
 
-        fig_pie = px.pie(
-            names=["Yes", "No"],
-            values=[yes_count, no_count],
-            title=f"{col} ({selected_college if selected_college != 'All' else 'All Colleges'})",
-            color=["Yes", "No"],
-            color_discrete_map={"Yes": "#1f77b4", "No": "#ff7f0e"}
-        )
+with f6:
+    clear = st.button("Clear Filters", key="clear")
 
-        with cols[i % 2]:
-            st.plotly_chart(fig_pie, use_container_width=True)
+# Custom CSS
+st.markdown("""
+<style>
+/* Make all buttons consistent */
+div[data-testid="stButton"] > button {
+    border-radius: 8px;
+    padding: 8px 20px;
+    font-weight: 600;
+}
 
-    # Collapsible raw data table
-    with st.expander("Show Raw College Data Table"):
-        st.dataframe(college_data, height=400)
+/* First button (Apply Filters) → Yellow */
+div[data-testid="stButton"]:nth-of-type(1) > button {
+    background-color: #FFD700 !important;  /* Yellow */
+    color: black !important;
+}
+
+/* Second button (Clear Filters) → Grey */
+div[data-testid="stButton"]:nth-of-type(2) > button {
+    background-color: #A9A9A9 !important;  /* Grey */
+    color: white !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
+
+# -----------------------------
+# Apply filtering
+# -----------------------------
+filtered = data.copy()
+
+# Calculate compliance early for filtering
+filtered["Compliance %"] = (filtered[list(facility_cols.keys())].mean(axis=1) * 100).round(0)
+if apply:
+    if selected_district != "All":
+        filtered = filtered[filtered[col_district] == selected_district]
+    if selected_gender != "All":
+        filtered = filtered[filtered[col_gender] == selected_gender]
+    if selected_type != "All":
+        filtered = filtered[filtered[col_type] == selected_type]
+    if selected_compliance == "<= 50%":
+        filtered = filtered[filtered["Compliance %"] <= 50]
+    elif selected_compliance == "> 50%":
+        filtered = filtered[filtered["Compliance %"] > 50]
+
+if clear:
+    for key in ["district", "gender", "type", "compliance"]:
+        st.session_state.pop(key, None)
+    st.rerun()
+
+
+
+# -----------------------------
+# Facility Icons with % Compliance
+# -----------------------------
+#st.markdown("### 🏫 Facility Compliance Overview")
+
+cols = st.columns(6)
+
+
+def get_base64_image(image_path):
+    with open(image_path, "rb") as f:
+        return base64.b64encode(f.read()).decode()
+
+
+for i, (facility, icon_file) in enumerate(facility_cols.items()):
+    yes_rate = int((filtered[facility].mean() * 100) if len(filtered) > 0 else 0)
+    icon_base64 = get_base64_image(icon_file)
+
+    with cols[i % 6]:
+        st.markdown(f"""
+        <div style="background:white; padding:15px; border-radius:10px; text-align:center;">
+            <img src="data:image/png;base64,{icon_base64}" width="120">
+            <h5 style="color:black; text-align:center;">{yes_rate}%</h5>
+        </div>
+        """, unsafe_allow_html=True)
+
+# -----------------------------
+# Detailed College List
+# -----------------------------
+st.markdown("### 📋 Detailed College List")
+
+# Calculate compliance per row
+filtered["Compliance %"] = (filtered[list(facility_cols.keys())].mean(axis=1) * 100).round(0)
+def compliance_badge(val):
+    """Return HTML span with background only behind text (not whole cell)."""
+    try:
+        num = int(str(val).replace('%', ''))
+    except:
+        return val  # if not a number, return as is
+
+    if num <= 50:
+        color = "#ffcccc"
+        text_color = "#b30000"
+    else:
+        color = "#ccffcc"
+        text_color = "#006600"
+
+    return (
+        f"<span style='background-color:{color}; color:{text_color}; "
+        f"font-weight:bold; border-radius:4px; padding:2px 6px; "
+        f"display:inline-block; text-align:center;'>{val}</span>"
+    )
+
+
+# Prepare dataframe
+styled_df = filtered[
+    [col_college, col_district, col_gender, col_type, "Compliance %", col_officer]
+].copy()
+
+# Format percentages nicely
+styled_df["Compliance %"] = styled_df["Compliance %"].apply(
+    lambda x: f"{int(x)}%" if float(x).is_integer() else f"{x:.1f}%"
+)
+
+# Apply badge formatting
+styled_df["Compliance %"] = styled_df["Compliance %"].apply(compliance_badge)
+
+# Render as HTML table (escape=False lets HTML work)
+html_table = styled_df.to_html(escape=False, index=False)
+
+# Force table width 100% and LTR headers
+html_table = html_table.replace(
+    "<table",
+    '<table style="width:100%;"'
+).replace(
+    "<th",
+    '<th style="direction:ltr; text-align:left;"'
+)
+
+st.markdown(
+    f"""
+    <div style="max-height:500px; overflow-y:auto; overflow-x:auto; width:100%;">
+        {html_table}
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+
 
 
 
