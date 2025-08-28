@@ -4,12 +4,39 @@ import streamlit as st
 import pandas as pd
 from google.oauth2.service_account import Credentials
 import gspread
-
+# Load data
+from streamlit_autorefresh import st_autorefresh
 # -----------------------------
 # Page Config
 # -----------------------------
+def get_base64_image(image_path):
+    with open(image_path, "rb") as f:
+        return base64.b64encode(f.read()).decode()
+
+
 st.set_page_config(page_title="College Facility Dashboard", layout="wide")
 
+logo_path = "logo_hed.png"
+
+st.markdown(
+    f"""
+    <div style="width: 100%; display: flex; justify-content: center; align-items: center; margin-top: -40px;">
+        <div style="margin-right: 15px;">
+            <img src="data:image/png;base64,{get_base64_image(logo_path)}" 
+                 alt="Logo" width="120">
+        </div>
+        <div style="text-align: center;">
+            <h1 style="color: green; font-size: 40px; margin-bottom: 5px;">
+                Higher Education Department
+            </h1>
+            <h4 style="color: black; font-size: 18px; margin-top: 0; white-space: nowrap;">
+                Special Monitoring Drive of Govt. Colleges (College cleanliness and readiness)
+            </h4>
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 # -----------------------------
 # Google Sheets Authentication
 # -----------------------------
@@ -25,7 +52,7 @@ worksheet_name = "Form Responses 1"
 sh = gc.open(sheet_name)
 ws = sh.worksheet(worksheet_name)
 
-# Load data
+st_autorefresh(interval=60 * 1000, key="datarefresh")
 data = pd.DataFrame(ws.get_all_records())
 data.columns = [col.strip() for col in data.columns]
 
@@ -55,6 +82,20 @@ facility_cols = {
     "Principal and administration staff presence on reopening day?": 'attendance.jpg',
     "Students attendance registers available and ready?": "students.jpg"
 }
+facility_label = [
+    "Classrooms cleaned, ventilated?",
+    "Toilets cleaned, functional?",
+    "Drinking water availability?",
+    "Electricity and lighting functional?",
+    "Campus grounds cleaned?",
+    "Boundary wall and gates secured?",
+    "Science labs readiness?",
+    "IT/Computer labs functional?",
+    "Library operational?",
+    "Biometric Attendance functional?",
+    'Staff Presence?',
+    "Student Attendance Registers Ready?"
+]
 
 # Convert yes/no → 1/0
 for col in facility_cols.keys():
@@ -63,10 +104,20 @@ for col in facility_cols.keys():
 # -----------------------------
 # Top Summary Cards
 # -----------------------------
-st.markdown("## 🎓 College Monitoring Overview")
-col1, col2, col3, col4 = st.columns(4)
+#st.markdown("## 🎓 College Monitoring Overview")
+col1, col2, col3, col4, col5 = st.columns(5)
 
+# 1st column → Total Colleges
 with col1:
+    st.markdown(f"""
+    <div style="background:#8e44ad; padding:20px; border-radius:10px; text-align:center;">
+        <h2 style="color:white;">{len(data)}</h2>
+        <p style="color:white;">Total Colleges</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+# 2nd column → General
+with col2:
     st.markdown(f"""
     <div style="background:#3498db; padding:20px; border-radius:10px; text-align:center;">
         <h2 style="color:white;">{(data[col_type]=='General').sum()}</h2>
@@ -74,15 +125,17 @@ with col1:
     </div>
     """, unsafe_allow_html=True)
 
-with col2:
+# 3rd column → Commerce
+with col3:
     st.markdown(f"""
-    <div style="background:#2f3542; padding:20px; border-radius:10px; text-align:center;">
+    <div style="background:#808080; padding:20px; border-radius:10px; text-align:center;">
         <h2 style="color:white;">{(data[col_type]=='Commerce').sum()}</h2>
         <p style="color:white;">Commerce Colleges</p>
     </div>
     """, unsafe_allow_html=True)
 
-with col3:
+# 4th column → Male
+with col4:
     st.markdown(f"""
     <div style="background:#2ecc71; padding:20px; border-radius:10px; text-align:center;">
         <h2 style="color:white;">{(data[col_gender]=='Male').sum()}</h2>
@@ -90,9 +143,10 @@ with col3:
     </div>
     """, unsafe_allow_html=True)
 
-with col4:
+# 5th column → Female
+with col5:
     st.markdown(f"""
-    <div style="background:#e74c3c; padding:20px; border-radius:10px; text-align:center;">
+    <div style="background:#e84393; padding:20px; border-radius:10px; text-align:center;">
         <h2 style="color:white;">{(data[col_gender]=='Female').sum()}</h2>
         <p style="color:white;">Female Colleges</p>
     </div>
@@ -233,14 +287,7 @@ if clear:
 # Facility Icons with % Compliance
 # -----------------------------
 #st.markdown("### 🏫 Facility Compliance Overview")
-
 cols = st.columns(6)
-
-
-def get_base64_image(image_path):
-    with open(image_path, "rb") as f:
-        return base64.b64encode(f.read()).decode()
-
 
 for i, (facility, icon_file) in enumerate(facility_cols.items()):
     yes_rate = int((filtered[facility].mean() * 100) if len(filtered) > 0 else 0)
@@ -248,9 +295,12 @@ for i, (facility, icon_file) in enumerate(facility_cols.items()):
 
     with cols[i % 6]:
         st.markdown(f"""
-        <div style="background:white; padding:15px; border-radius:10px; text-align:center;">
-            <img src="data:image/png;base64,{icon_base64}" width="120">
-            <h5 style="color:black; text-align:center;">{yes_rate}%</h5>
+        <div style="background:white; padding:15px; border-radius:10px; text-align:center; min-height:180px;">
+            <p style="color:#2c3e50; font-size:14px; font-weight:bold; margin-bottom:8px;">{facility_label[i]}</p>
+            <img src="data:image/png;base64,{icon_base64}" width="100" style="display:block; margin:auto; margin-bottom:6px;">
+            <p style="color:black; font-size:25px; font-weight:bold; margin:0; display:block; text-align:center; margin:auto;">
+    {yes_rate}%
+</p>
         </div>
         """, unsafe_allow_html=True)
 
@@ -315,10 +365,3 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
-
-
-
-
-
-
-
