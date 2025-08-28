@@ -112,7 +112,7 @@ with col1:
     st.markdown(f"""
     <div style="background:#8e44ad; padding:20px; border-radius:10px; text-align:center;">
         <h2 style="color:white;">{len(data)}</h2>
-        <p style="color:white;">Total Colleges</p>
+        <p style="color:white;">Total Colleges Visited</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -365,4 +365,5 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
 
