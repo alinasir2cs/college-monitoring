@@ -52,7 +52,7 @@ worksheet_name = "Form Responses 1"
 sh = gc.open(sheet_name)
 ws = sh.worksheet(worksheet_name)
 
-st_autorefresh(interval=60 * 1000, key="datarefresh")
+st_autorefresh(interval=300 * 1000, key="datarefresh")
 data = pd.DataFrame(ws.get_all_records())
 data.columns = [col.strip() for col in data.columns]
 
@@ -365,3 +365,4 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
