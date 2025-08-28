@@ -295,12 +295,27 @@ for i, (facility, icon_file) in enumerate(facility_cols.items()):
 
     with cols[i % 6]:
         st.markdown(f"""
-        <div style="background:white; padding:15px; border-radius:10px; text-align:center; min-height:180px;">
-            <p style="color:#2c3e50; font-size:14px; font-weight:bold; margin-bottom:8px;">{facility_label[i]}</p>
-            <img src="data:image/png;base64,{icon_base64}" width="100" style="display:block; margin:auto; margin-bottom:6px;">
-            <p style="color:black; font-size:25px; font-weight:bold; margin:0; display:block; text-align:center; margin:auto;">
-    {yes_rate}%
-</p>
+        <div style="
+            background:white; 
+            padding:15px; 
+            border-radius:10px; 
+            text-align:center; 
+            min-height:220px; 
+            display:flex; 
+            flex-direction:column; 
+            justify-content:space-between;
+        ">
+            <p style="color:#2c3e50; font-size:14px; font-weight:bold; margin-bottom:8px; flex:0;">
+                {facility_label[i]}
+            </p>
+            <div style="flex:1; display:flex; align-items:center; justify-content:center;">
+                <img src="data:image/png;base64,{icon_base64}" 
+                     width="80" 
+                     style="max-height:80px; object-fit:contain;"/>
+            </div>
+            <p style="color:black; font-size:22px; font-weight:bold; margin-top:8px; flex:0;">
+                {yes_rate}%
+            </p>
         </div>
         """, unsafe_allow_html=True)
 
@@ -365,5 +380,6 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
 
 
