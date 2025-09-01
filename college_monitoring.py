@@ -226,6 +226,13 @@ with f4:
         key="compliance"
     )
 
+with st.expander("Facility Filters"):
+    selected_facility = st.selectbox(
+        "Show colleges where the following facility is NOT available",
+        options=["None"] + list(facility_cols.keys()),
+        key="facility_filter"
+    )
+
 with f5:
     apply = st.button("Apply Filters", key="apply")
 
@@ -276,9 +283,33 @@ if apply:
     elif selected_compliance == "> 50%":
         filtered = filtered[filtered["Compliance %"] > 50]
 
+    if st.session_state.get("facility_filter") not in [None, "None"]:
+        fac_col = st.session_state["facility_filter"]
+        filtered = filtered[filtered[fac_col] == 0]
+
+if st.session_state["district"] != "All":
+    filtered = filtered[filtered[col_district] == st.session_state["district"]]
+if st.session_state["gender"] != "All":
+    filtered = filtered[filtered[col_gender] == st.session_state["gender"]]
+if st.session_state["type"] != "All":
+    filtered = filtered[filtered[col_type] == st.session_state["type"]]
+if st.session_state["compliance"] == "<= 50%":
+    filtered = filtered[filtered["Compliance %"] <= 50]
+elif st.session_state["compliance"] == "> 50%":
+    filtered = filtered[filtered["Compliance %"] > 50]
+if st.session_state.get("facility_filter") not in [None, "None"]:
+    filtered = filtered[filtered[st.session_state["facility_filter"]] == 0]
+
 if clear:
-    for key in ["district", "gender", "type", "compliance"]:
+    for key in ["district", "gender", "type", "compliance", "facility_filter"]:
         st.session_state.pop(key, None)
+    if "facility_filter" not in st.session_state:
+        st.session_state["facility_filter"] = "None"
+    st.session_state["district"] = "All"
+    st.session_state["gender"] = "All"
+    st.session_state["type"] = "All"
+    st.session_state["compliance"] = "All"
+    st.session_state["facility_filter"] = "None"
     st.rerun()
 
 
@@ -319,6 +350,7 @@ for i, (facility, icon_file) in enumerate(facility_cols.items()):
         </div>
         """, unsafe_allow_html=True)
 
+
 # -----------------------------
 # Detailed College List
 # -----------------------------
@@ -346,7 +378,6 @@ def compliance_badge(val):
         f"display:inline-block; text-align:center;'>{val}</span>"
     )
 
-
 # Prepare dataframe
 styled_df = filtered[
     [col_college, col_district, col_gender, col_type, "Compliance %", col_officer]
@@ -359,6 +390,50 @@ styled_df["Compliance %"] = styled_df["Compliance %"].apply(
 
 # Apply badge formatting
 styled_df["Compliance %"] = styled_df["Compliance %"].apply(compliance_badge)
+
+# Add "View Details" button with Popover API
+# Add "View Details" button with Popover API
+def make_detail_button(row, idx):
+    popup_id = f"popup_{idx}"
+
+    # Facility breakdown (yes/no with colored icons)
+    facilities_html = ""
+    for fac, label in zip(facility_cols.keys(), facility_label):
+        status = "✅ Yes" if row[fac] == 1 else "❌ No"
+        color = "green" if row[fac] == 1 else "red"
+        facilities_html += f"<p><b>{label}:</b> <span style='color:{color}; font-weight:bold;'>{status}</span></p>"
+
+    # Compliance % badge already formatted in table
+    compliance_val = row["Compliance %"]
+
+    return f"""
+        <button popovertarget="{popup_id}" popovertargetaction="toggle"
+            style="padding:4px 8px; border:none; background:#007bff; color:white; 
+                   border-radius:4px; cursor:pointer;">
+            View Details
+        </button>
+        <div id="{popup_id}" popover="auto"
+            style="padding:15px; border:1px solid #ccc; border-radius:8px; 
+                   max-width:500px; background:white; box-shadow:0 4px 10px rgba(0,0,0,0.2); 
+                   max-height:80vh; overflow-y:auto;">
+            <h3 style="margin-top:0; color:#2c3e50;">{row[col_college]}</h3>
+            <hr>
+            <h4 style="margin-bottom:5px;">Facility Status</h4>
+            <div style="font-size:14px; line-height:1.4;">
+                {facilities_html}
+            </div>
+            <button popovertarget="{popup_id}" popovertargetaction="hide"
+                style="margin-top:15px; padding:6px 12px; border:none; background:#dc3545; 
+                       color:white; border-radius:4px; cursor:pointer;">
+                Close
+            </button>
+        </div>
+    """.replace("\n", "")
+
+details_col = []
+for idx, row in filtered.iterrows():
+    details_col.append(make_detail_button(row, idx))
+styled_df["Details"] = details_col
 
 # Render as HTML table (escape=False lets HTML work)
 html_table = styled_df.to_html(escape=False, index=False)
@@ -374,12 +449,9 @@ html_table = html_table.replace(
 
 st.markdown(
     f"""
-    <div style="max-height:500px; overflow-y:auto; overflow-x:auto; width:100%;">
+    <div style="max-height:600px; overflow-y:auto; overflow-x:auto; width:100%;">
         {html_table}
     </div>
     """,
     unsafe_allow_html=True,
 )
-
-
-
