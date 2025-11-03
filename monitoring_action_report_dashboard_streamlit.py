@@ -138,7 +138,7 @@ if st.sidebar.checkbox('Show raw preview', value=False):
 
 # ---------------------- FILTERS ----------------------
 
-filter_columns = ['District', 'College Name', 'College Gender', 'College Type', 'Category', 'Reason', 'Action By']
+filter_columns = ['District', 'College Name', 'College Gender', 'College Type', 'Category', 'Action', 'Reason', 'Action By']
 for col in filter_columns:
     if col in df.columns:
         df = multi_filter(df, col)
