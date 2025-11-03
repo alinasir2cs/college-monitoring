@@ -53,7 +53,9 @@ def merge_duplicate_columns(df: pd.DataFrame):
 def load_data():
     """Always load directly from Google Sheet."""
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    creds = Credentials.from_service_account_file("colleges_mo.json", scopes=scope)
+    creds = Credentials.from_service_account_info(
+    st.secrets["gcp_service_account"], scopes=scope
+    )
     client = gspread.authorize(creds)
     sheet = client.open_by_url(DEFAULT_SHEET_URL).sheet1
     rows = sheet.get_all_values()
