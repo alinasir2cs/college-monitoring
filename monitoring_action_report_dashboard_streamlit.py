@@ -157,7 +157,7 @@ card_style = """
 total_actions = len(df)
 unique_colleges = df['College Name'].nunique() if 'College Name' in df.columns else 0
 salary_ded = df[df['Action'].str.contains('Salary', case=False, na=False)]
-total_salary_ded = (salary_ded['Salary Deducted'].apply(pd.to_numeric, errors='coerce').sum() if not salary_ded.empty else 0)
+total_salary_ded = int((salary_ded['Salary Deducted'].apply(pd.to_numeric, errors='coerce').sum() if not salary_ded.empty else 0))
 
 facility_updates = df[df['Category'].astype(str).str.contains('Facility', case=False, na=False)]
 actions_against_employees = df[df['Category'].astype(str).str.contains('Employee', case=False, na=False)]
