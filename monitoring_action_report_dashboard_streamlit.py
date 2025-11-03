@@ -129,12 +129,7 @@ st.markdown(
 )
 
 # ---------------------- LOAD DATA ----------------------
-
-with st.spinner('Loading data from Google Sheet...'):
-    df = load_data()
-
-if st.sidebar.checkbox('Show raw preview', value=False):
-    st.sidebar.dataframe(df.head(20))
+df = load_data()
 
 # ---------------------- FILTERS ----------------------
 
