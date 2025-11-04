@@ -166,7 +166,7 @@ proxy_attendance = df[df['Reason'].astype(str).str.contains('Proxy Attendance', 
 kpis = [
     ("#16a085", total_actions, "Total Actions"),
     ("#2980b9", unique_colleges, "Colleges"),
-    ("#d35400", f"PKR {total_salary_ded}", "Salary Deduction")
+    ("#d35400", f"PKR {total_salary_ded}", "Salary Deduction"),
     ("#8e44ad", len(facility_updates), "Facility Updates"),
     ("#c0392b", len(actions_against_employees), "Employee Actions"),
     ("#e74c3c", len(proxy_attendance), "Proxy Attendance Cases"),
