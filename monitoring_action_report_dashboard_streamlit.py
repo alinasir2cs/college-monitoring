@@ -139,8 +139,8 @@ st.sidebar.header("Filters")
 # --- Reset button ---
 if st.sidebar.button("🔄 Reset Filters"):
     for key in list(st.session_state.keys()):
-        if key in ['District', 'College Name', 'College Gender', 'College Type', 'Category', 'Action', 'Reason', 'Action By']:
-            del st.session_state['All']
+        if key in ['District', 'College Name', 'College Gender', 'College Type', 'Category', 'Action', 'Reason', 'Action By', 'Search']:
+            del st.session_state[key]
     st.rerun()
 
 # --- Define filters ---
@@ -151,10 +151,11 @@ for col in filter_columns:
         df = multi_filter(df, col)
 
 # --- Text search ---
-text_search = st.sidebar.text_input('Search across all columns')
+text_search = st.sidebar.text_input('Search across all columns', key='Search')
 if text_search:
     mask = df.astype(str).apply(lambda row: row.str.contains(text_search, case=False, na=False)).any(axis=1)
     df = df[mask]
+
 
 
 # ---------------------- KPI CARDS ----------------------
