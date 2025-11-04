@@ -139,7 +139,7 @@ st.sidebar.header("Filters")
 # --- Reset button ---
 if st.sidebar.button("🔄 Reset Filters"):
     st.session_state.clear()
-    st.experimental_rerun()
+    st.rerun()
 
 # --- Define filters ---
 filter_columns = ['District', 'College Name', 'College Gender', 'College Type', 'Category', 'Action', 'Reason', 'Action By']
