@@ -229,12 +229,16 @@ st.markdown("---")
 # ---------------------- CHARTS ----------------------
 
 if 'Action' in df.columns:
-    st.subheader('Actions Overview')
-    cat_counts = df['Action'].value_counts().reset_index()
-    cat_counts.columns = ['Action', 'Count']
-    fig = px.pie(cat_counts, values='Count', names='Action', hole=0.3)
-    fig.update_traces(textinfo='label+value', textfont=dict(size=14, family='Arial Black'))
-    st.plotly_chart(fig, use_container_width=True)
+    valid_actions = df['Action'].dropna().astype(str).str.strip()
+    valid_actions = valid_actions[valid_actions != '']  # remove empty strings
+
+    if not valid_actions.empty:
+        st.subheader('Actions Overview')
+        cat_counts = valid_actions.value_counts().reset_index()
+        cat_counts.columns = ['Action', 'Count']
+        fig = px.pie(cat_counts, values='Count', names='Action', hole=0.3)
+        fig.update_traces(textinfo='label+value', textfont=dict(size=14, family='Arial Black'))
+        st.plotly_chart(fig, use_container_width=True)
 
 st.markdown("---")
 
