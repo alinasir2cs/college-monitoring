@@ -187,7 +187,7 @@ kpis = [
     ("#f39c12", len(habitual_absenteeism_actions), "Habitual Absenteeism Action"),
 ]
 
-# --- Create layout: 2 rows × 4 columns ---
+# --- Create layout: 2 rows × 4 columns with spacing ---
 for row_start in range(0, len(kpis), 4):
     cols = st.columns(4)
     for i, (color, value, label) in enumerate(kpis[row_start:row_start + 4]):
@@ -201,7 +201,8 @@ for row_start in range(0, len(kpis), 4):
                 """,
                 unsafe_allow_html=True
             )
-
+    # Add small vertical space between rows
+    st.markdown("<div style='margin-top: 15px;'></div>", unsafe_allow_html=True)
 
 st.markdown("---")
 
