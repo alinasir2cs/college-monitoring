@@ -133,15 +133,27 @@ df = load_data()
 
 # ---------------------- FILTERS ----------------------
 
+# Sidebar title
+st.sidebar.header("Filters")
+
+# --- Reset button ---
+if st.sidebar.button("🔄 Reset Filters"):
+    st.session_state.clear()
+    st.experimental_rerun()
+
+# --- Define filters ---
 filter_columns = ['District', 'College Name', 'College Gender', 'College Type', 'Category', 'Action', 'Reason', 'Action By']
+
 for col in filter_columns:
     if col in df.columns:
         df = multi_filter(df, col)
 
+# --- Text search ---
 text_search = st.sidebar.text_input('Search across all columns')
 if text_search:
     mask = df.astype(str).apply(lambda row: row.str.contains(text_search, case=False, na=False)).any(axis=1)
     df = df[mask]
+
 
 # ---------------------- KPI CARDS ----------------------
 
