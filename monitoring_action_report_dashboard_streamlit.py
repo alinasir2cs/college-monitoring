@@ -141,7 +141,9 @@ filter_columns = ['District', 'College Name', 'College Gender', 'College Type', 
 # 👇 Define custom allowed options for specific filters
 custom_filter_options = {
     "Reason": [
-        "Habitual Absenteeism"
+        "Habitual Absentiesm",
+        "Proxy Attendance",
+        "Staff absent during monitoring visit"
     ]
 }
 
