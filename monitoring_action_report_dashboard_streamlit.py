@@ -137,11 +137,11 @@ df = load_data()
 st.sidebar.header("Filters")
 
 # --- Reset button ---
-if st.sidebar.button("🔄 Reset Filters"):
+'''if st.sidebar.button("🔄 Reset Filters"):
     for key in list(st.session_state.keys()):
         if key in ['District', 'College Name', 'College Gender', 'College Type', 'Category', 'Action', 'Reason', 'Action By', 'Search']:
             del st.session_state[key]
-    st.rerun()
+    st.rerun()'''
 
 # --- Define filters ---
 filter_columns = ['District', 'College Name', 'College Gender', 'College Type', 'Category', 'Action', 'Reason', 'Action By']
