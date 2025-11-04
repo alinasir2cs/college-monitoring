@@ -192,7 +192,7 @@ actions_against_employees = df[df['Category'].astype(str).str.contains('Employee
 proxy_attendance = df[df['Reason'].astype(str).str.contains('Proxy Attendance', case=False, na=False)]
 
 # --- Define new KPI metrics ---
-unvisited_college_actions = df[df["Category"].str.contains("Unvisited", case=False, na=False)]
+unvisited_college_actions = df[df["Category"].str.contains("College Not visited", case=False, na=False)]
 habitual_absenteeism_actions = df[df["Reason"].str.contains("Habitual Absentiesm", case=False, na=False)]
 
 # --- Prepare KPI data ---
