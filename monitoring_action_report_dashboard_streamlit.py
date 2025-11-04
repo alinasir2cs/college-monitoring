@@ -138,7 +138,9 @@ st.sidebar.header("Filters")
 
 # --- Reset button ---
 if st.sidebar.button("🔄 Reset Filters"):
-    st.session_state.clear()
+    for key in list(st.session_state.keys()):
+        if key in ['District', 'College Name', 'College Gender', 'College Type', 'Category', 'Action', 'Reason', 'Action By', 'Search']:
+            del st.session_state[key]
     st.rerun()
 
 # --- Define filters ---
