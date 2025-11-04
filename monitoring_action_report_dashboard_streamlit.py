@@ -133,21 +133,46 @@ df = load_data()
 
 # ---------------------- FILTERS ----------------------
 
-# Sidebar title
 st.sidebar.header("Filters")
 
-# --- Define filters ---
+# Define filters and any fixed options you want
 filter_columns = ['District', 'College Name', 'College Gender', 'College Type', 'Category', 'Action', 'Reason', 'Action By']
 
+# 👇 Define custom allowed options for specific filters
+custom_filter_options = {
+    "Reason": [
+        "Habitual Absenteeism"
+    ]
+}
+
+# --- Reset button ---
+if st.sidebar.button("🔄 Reset Filters"):
+    for key in st.session_state.keys():
+        if key.startswith("filter_") or key == "Search":
+            del st.session_state[key]
+    st.rerun()
+
+# --- Apply filters ---
 for col in filter_columns:
     if col in df.columns:
-        df = multi_filter(df, col)
+        # Use predefined options if available, else get unique values from df
+        if col in custom_filter_options:
+            opts = ['All'] + custom_filter_options[col]
+        else:
+            opts = ['All'] + sorted(df[col].dropna().astype(str).unique().tolist())
+
+        state_key = f"filter_{col}"
+        choice = st.sidebar.multiselect(col, opts, default=['All'], key=state_key)
+
+        if 'All' not in choice and choice:
+            df = df[df[col].astype(str).isin(choice)]
 
 # --- Text search ---
 text_search = st.sidebar.text_input('Search across all columns', key='Search')
 if text_search:
     mask = df.astype(str).apply(lambda row: row.str.contains(text_search, case=False, na=False)).any(axis=1)
     df = df[mask]
+
 
 
 
