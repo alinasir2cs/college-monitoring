@@ -145,13 +145,6 @@ custom_filter_options = {
     ]
 }
 
-# --- Reset button ---
-if st.sidebar.button("🔄 Reset Filters"):
-    for key in st.session_state.keys():
-        if key.startswith("filter_") or key == "Search":
-            del st.session_state[key]
-    st.rerun()
-
 # --- Apply filters ---
 for col in filter_columns:
     if col in df.columns:
