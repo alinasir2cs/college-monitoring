@@ -171,26 +171,37 @@ facility_updates = df[df['Category'].astype(str).str.contains('Facility', case=F
 actions_against_employees = df[df['Category'].astype(str).str.contains('Employee', case=False, na=False)]
 proxy_attendance = df[df['Reason'].astype(str).str.contains('Proxy Attendance', case=False, na=False)]
 
+# --- Define new KPI metrics ---
+unvisited_college_actions = df[df["Action"].str.contains("Unvisited", case=False, na=False)]
+habitual_absenteeism_actions = df[df["Action"].str.contains("Habitual Absent", case=False, na=False)]
+
+# --- Prepare KPI data ---
 kpis = [
     ("#16a085", total_actions, "Total Actions"),
     ("#2980b9", unique_colleges, "Colleges"),
-    ("#d35400", total_salary_ded, "Salary Deduction"),
+    ("#d35400", f"PKR {total_salary_ded}", "Salary Deduction"),
     ("#8e44ad", len(facility_updates), "Facility Updates"),
     ("#c0392b", len(actions_against_employees), "Employee Actions"),
     ("#e74c3c", len(proxy_attendance), "Proxy Attendance Cases"),
+    ("#27ae60", len(unvisited_college_actions), "Unvisited Colleges Action"),
+    ("#f39c12", len(habitual_absenteeism_actions), "Habitual Absenteeism Action"),
 ]
 
-for i, (color, value, label) in enumerate(kpis):
-    with [col1, col2, col3, col4, col5, col6][i]:
-        st.markdown(
-            f"""
-            <div style="{card_style.format(color=color)}">
-                <h2 style="color:white; margin:0;">{value}</h2>
-                <p style="color:white; margin:0; font-weight:600;">{label}</p>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+# --- Create layout: 2 rows × 4 columns ---
+for row_start in range(0, len(kpis), 4):
+    cols = st.columns(4)
+    for i, (color, value, label) in enumerate(kpis[row_start:row_start + 4]):
+        with cols[i]:
+            st.markdown(
+                f"""
+                <div style="{card_style.format(color=color)}">
+                    <h2 style="color:white; margin:0;">{value}</h2>
+                    <p style="color:white; margin:0; font-weight:600;">{label}</p>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
 
 st.markdown("---")
 
