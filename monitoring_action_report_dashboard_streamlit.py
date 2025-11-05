@@ -204,7 +204,7 @@ kpis = [
     ("#c0392b", "Warnings Issued", len(actions_against_employees)),
     ("#e74c3c", "Proxy Attendance Cases", len(proxy_attendance)),
     ("#27ae60", "Explanation Called", len(unvisited_college_actions)),
-    ("#f39c12", "Habitual Absenteeism Action", len(habitual_absenteeism_actions)),
+    ("#f39c12", "Inquiry Initiated", len(habitual_absenteeism_actions)),
 ]
 
 # --- Create layout: 2 rows × 4 columns with spacing ---
