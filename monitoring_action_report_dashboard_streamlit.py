@@ -250,7 +250,7 @@ df_display = df.dropna(axis=1, how='all')
 df_display = df_display.loc[:, ~(df_display.astype(str).apply(lambda x: x.str.strip()).eq('').all())]
 df_display.drop(columns=['Timestamp', 'Email Address'], errors='ignore', inplace=True)
 df_display.reset_index(drop=True, inplace=True)
-st.dataframe(df_display, height=600)
+st.dataframe(df_display.reset_index(drop=True), height=600)
 
 @st.cache_data
 def convert_df_to_csv(dataframe):
