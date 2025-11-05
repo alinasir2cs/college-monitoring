@@ -200,7 +200,7 @@ kpis = [
     ("#16a085", "Total Actions", total_actions),
     ("#2980b9", "Colleges", unique_colleges),
     ("#d35400", "Salary Deduction", f"PKR {total_salary_ded}"),
-    ("#8e44ad", "Facility Updates" len(facility_updates)),
+    ("#8e44ad", "Facility Updates", len(facility_updates)),
     ("#c0392b", "Warnings Issued", len(actions_against_employees)),
     ("#e74c3c", "Proxy Attendance Cases", len(proxy_attendance)),
     ("#27ae60", "Explanation Called", len(unvisited_college_actions)),
