@@ -189,7 +189,7 @@ total_salary_ded = int((salary_ded['Salary Deducted'].apply(pd.to_numeric, error
 
 facility_updates = df[df['Category'].astype(str).str.contains('Facility', case=False, na=False)]
 actions_against_employees = df[df['Action'].astype(str).str.contains('Warning', case=False, na=False)]
-proxy_attendance = df[df['Reason'].astype(str).str.contains('Proxy Attendance', case=False, na=False)]
+proxy_attendance = df[df['Action'].astype(str).str.contains('Showcause', case=False, na=False)]
 
 # --- Define new KPI metrics ---
 unvisited_college_actions = df[df["Action"].str.contains("Explanation", case=False, na=False)]
@@ -202,7 +202,7 @@ kpis = [
     ("#d35400", "Salary Deduction", f"PKR {total_salary_ded}"),
     ("#8e44ad", "Facility Updates", len(facility_updates)),
     ("#c0392b", "Warnings Issued", len(actions_against_employees)),
-    ("#e74c3c", "Proxy Attendance Cases", len(proxy_attendance)),
+    ("#e74c3c", "Show Cause Issued", len(proxy_attendance)),
     ("#27ae60", "Explanation Called", len(unvisited_college_actions)),
     ("#f39c12", "Inquiry Initiated", len(habitual_absenteeism_actions)),
 ]
