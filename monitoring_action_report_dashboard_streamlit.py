@@ -188,11 +188,11 @@ salary_ded = df[df['Action'].str.contains('Salary', case=False, na=False)]
 total_salary_ded = int((salary_ded['Salary Deducted'].apply(pd.to_numeric, errors='coerce').sum() if not salary_ded.empty else 0))
 
 facility_updates = df[df['Category'].astype(str).str.contains('Facility', case=False, na=False)]
-actions_against_employees = df[df['Category'].astype(str).str.contains('Employee', case=False, na=False)]
+actions_against_employees = df[df['Action'].astype(str).str.contains('Warning', case=False, na=False)]
 proxy_attendance = df[df['Reason'].astype(str).str.contains('Proxy Attendance', case=False, na=False)]
 
 # --- Define new KPI metrics ---
-unvisited_college_actions = df[df["Category"].str.contains("College Not visited", case=False, na=False)]
+unvisited_college_actions = df[df["Action"].str.contains("Explanation", case=False, na=False)]
 habitual_absenteeism_actions = df[df["Reason"].str.contains("Habitual Absentiesm", case=False, na=False)]
 
 # --- Prepare KPI data ---
@@ -201,9 +201,9 @@ kpis = [
     ("#2980b9", unique_colleges, "Colleges"),
     ("#d35400", f"PKR {total_salary_ded}", "Salary Deduction"),
     ("#8e44ad", len(facility_updates), "Facility Updates"),
-    ("#c0392b", len(actions_against_employees), "Employee Actions"),
+    ("#c0392b", len(actions_against_employees), "Warnings Issued"),
     ("#e74c3c", len(proxy_attendance), "Proxy Attendance Cases"),
-    ("#27ae60", len(unvisited_college_actions), "Unvisited Colleges Action"),
+    ("#27ae60", len(unvisited_college_actions), "Explanation Called"),
     ("#f39c12", len(habitual_absenteeism_actions), "Habitual Absenteeism Action"),
 ]
 
