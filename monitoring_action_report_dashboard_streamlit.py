@@ -12,7 +12,7 @@ import os
 # ---------------------- CONFIG ----------------------
 
 st.set_page_config(
-    page_title="Colleges Monitoring Dashboard",
+    page_title="Colleges Monitoring Action Dashboard",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -120,7 +120,7 @@ st.markdown(
                 Higher Education Department
             </h1>
             <h4 style="color: black; font-size: 22px; margin-top: 0;">
-                Colleges Monitoring Dashboard
+                Colleges Monitoring Action Dashboard
             </h4>
         </div>
     </div>
@@ -172,8 +172,6 @@ if text_search:
 
 
 # ---------------------- KPI CARDS ----------------------
-
-st.markdown("## Monitoring Action Report Overview")
 
 col1, col2, col3, col4, col5, col6 = st.columns(6)
 card_style = """
