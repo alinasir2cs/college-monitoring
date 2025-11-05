@@ -215,7 +215,7 @@ for row_start in range(0, len(kpis), 4):
             st.markdown(
                 f"""
                 <div style="{card_style.format(color=color)}">
-                    <h4 style="color:white; margin:0;">{value}</h4>
+                    <h5 style="color:white; margin:0;">{value}</h5>
                     <h3 style="color:white; margin:0; font-weight:600;">{label}</h3>
                 </div>
                 """,
