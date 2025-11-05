@@ -197,14 +197,14 @@ habitual_absenteeism_actions = df[df["Reason"].str.contains("Habitual Absentiesm
 
 # --- Prepare KPI data ---
 kpis = [
-    ("#16a085", total_actions, "Total Actions"),
-    ("#2980b9", unique_colleges, "Colleges"),
-    ("#d35400", f"PKR {total_salary_ded}", "Salary Deduction"),
-    ("#8e44ad", len(facility_updates), "Facility Updates"),
-    ("#c0392b", len(actions_against_employees), "Warnings Issued"),
-    ("#e74c3c", len(proxy_attendance), "Proxy Attendance Cases"),
-    ("#27ae60", len(unvisited_college_actions), "Explanation Called"),
-    ("#f39c12", len(habitual_absenteeism_actions), "Habitual Absenteeism Action"),
+    ("#16a085", "Total Actions", total_actions),
+    ("#2980b9", "Colleges", unique_colleges),
+    ("#d35400", "Salary Deduction", f"PKR {total_salary_ded}"),
+    ("#8e44ad", "Facility Updates" len(facility_updates)),
+    ("#c0392b", "Warnings Issued", len(actions_against_employees)),
+    ("#e74c3c", "Proxy Attendance Cases", len(proxy_attendance)),
+    ("#27ae60", "Explanation Called", len(unvisited_college_actions)),
+    ("#f39c12", "Habitual Absenteeism Action", len(habitual_absenteeism_actions)),
 ]
 
 # --- Create layout: 2 rows × 4 columns with spacing ---
