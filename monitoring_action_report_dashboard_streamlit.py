@@ -136,7 +136,7 @@ df = load_data()
 st.sidebar.header("Filters")
 
 # Define filters and any fixed options you want
-filter_columns = ['District', 'College Name', 'College Gender', 'College Type', 'Category', 'Action', 'Reason', 'Action By']
+filter_columns = ['Action Taken for the Month', 'District', 'College Name', 'College Gender', 'College Type', 'Category', 'Action', 'Reason', 'Action By']
 
 # 👇 Define custom allowed options for specific filters
 custom_filter_options = {
